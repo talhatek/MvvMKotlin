@@ -10,7 +10,9 @@
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark">
+        android:background="@android:color/holo_orange_dark"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_search"

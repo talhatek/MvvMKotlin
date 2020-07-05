@@ -44,12 +44,13 @@ class MainActivity : AppCompatActivity() {
         })
         postAdapter = PostAdapter()
         binding.ivSearch.setOnClickListener {
-
+            binding.etSearch.clearFocus()
         }
+        var temp: List<Post>
         viewModel.getAllPosts()
 
+
         //  val list=ArrayList<Post>()
-        var temp: List<Post>
         //  postAdapter.setList(list)
 
         binding.rv.addItemDecoration(
@@ -83,5 +84,10 @@ class MainActivity : AppCompatActivity() {
 
             }
         )
+    }
+
+    override fun onPause() {
+        binding.etSearch.text.clear()
+        super.onPause()
     }
 }

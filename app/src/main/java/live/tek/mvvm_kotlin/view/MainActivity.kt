@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.onesignal.OneSignal
 import live.tek.mvvm_kotlin.adapter.PostAdapter
 import live.tek.mvvm_kotlin.databinding.ActivityMainBinding
 import live.tek.mvvm_kotlin.model.Post
@@ -27,7 +28,10 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         viewModel = ViewModelProvider(this@MainActivity).get(MainActivityViewModel::class.java)
-
+        OneSignal.startInit(this)
+            .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+            .unsubscribeWhenNotificationsAreDisabled(true)
+            .init()
         viewModel.showProgress.observe(this@MainActivity, Observer {
             if (it) {
                 binding.searchProgress.visibility = VISIBLE

@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -40,22 +41,18 @@ class MainActivity : AppCompatActivity() {
             }
         })
         viewModel.postList.observe(this, Observer {
-            postAdapter.setList(it)
-            test = postAdapter.getList()
-            if (binding.rv.adapter == null) {
-                binding.rv.adapter = postAdapter
-            }
+            supplyToAdapter(it)
+            test=it
         })
-        postAdapter = PostAdapter()
+        postAdapter = PostAdapter(arrayListOf())
+        binding.rv.adapter=postAdapter
         binding.ivSearch.setOnClickListener {
-            binding.etSearch.clearFocus()
+
         }
-        var temp: List<Post>
         viewModel.getAllPosts()
+        var temp: List<Post>
 
 
-        //  val list=ArrayList<Post>()
-        //  postAdapter.setList(list)
 
         binding.rv.addItemDecoration(
             DividerItemDecoration(
@@ -63,7 +60,10 @@ class MainActivity : AppCompatActivity() {
                 LinearLayout.VERTICAL
             )
         )
+        binding.ivSearch.setOnClickListener {
 
+
+        }
         binding.etSearch.addTextChangedListener(
             object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
@@ -83,15 +83,22 @@ class MainActivity : AppCompatActivity() {
                     temp = test.filter {
                         it.body.contains(s.toString())
                     }
-                    postAdapter.setList(ArrayList(temp))
+                    postAdapter.apply {
+                        supplyPost(temp)
+                        notifyDataSetChanged()
+                    }
                 }
 
             }
         )
+
     }
 
-    override fun onPause() {
-        binding.etSearch.text.clear()
-        super.onPause()
+    private fun supplyToAdapter(posts: ArrayList<Post>) {
+        postAdapter.apply {
+            supplyPost(posts)
+            notifyDataSetChanged()
+
+        }
     }
 }

@@ -11,6 +11,7 @@ class MainActivityRepository(val application: Application) {
 
     fun changeState() {
         showProgress.value = !(showProgress.value != null && showProgress.value!!)
+
     }
 
     fun getAllPosts() {
@@ -22,9 +23,6 @@ class MainActivityRepository(val application: Application) {
                 postList.value = it
             }
             changeState()
-
         }
     }
-
-
 }

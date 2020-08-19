@@ -37,6 +37,7 @@
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        tools:listitem="@layout/post_item_layout"
         android:id="@+id/rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

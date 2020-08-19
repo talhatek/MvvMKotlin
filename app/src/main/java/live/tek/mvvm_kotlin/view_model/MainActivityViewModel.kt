@@ -14,7 +14,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     init {
         this.showProgress = repository.showProgress
         this.postList = repository.postList
-
     }
 
     fun changeState() {

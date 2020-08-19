@@ -5,18 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import live.tek.mvvm_kotlin.model.Post
 import live.tek.mvvm_kotlin.viewholder.PostViewHolder
 
-class PostAdapter : RecyclerView.Adapter<PostViewHolder>() {
-    private lateinit var postList: ArrayList<Post>
-
-    fun setList(list: ArrayList<Post>) {
-        this.postList = list
-        notifyDataSetChanged()
-
-    }
-
-    fun getList(): ArrayList<Post> {
-        return postList
-    }
+class PostAdapter(private val postList:ArrayList<Post>) : RecyclerView.Adapter<PostViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -30,6 +19,14 @@ class PostAdapter : RecyclerView.Adapter<PostViewHolder>() {
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         holder.bind(postList[position])
+    }
+
+    fun supplyPost(posts:List<Post>){
+        this.postList.apply {
+            clear()
+            addAll(posts)
+        }
+
     }
 
 

@@ -18,17 +18,17 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     init {
         this.showProgress = repository.showProgress
         this.postList = repository.postList
-      //  getAllPosts()
+
     }
 
     fun changeState() {
         repository.changeState()
     }
     fun doToast(){
-        Toast.makeText(app.applicationContext,"fdf",Toast.LENGTH_SHORT).show()
+        Toast.makeText(app.applicationContext, "Test", Toast.LENGTH_SHORT).show()
     }
 
-    private fun getAllPosts() {
+    fun getAllPosts() {
         repository.getAllPosts()
     }
 

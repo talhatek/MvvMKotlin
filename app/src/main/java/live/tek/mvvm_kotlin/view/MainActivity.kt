@@ -12,6 +12,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.onesignal.OneSignal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import live.tek.mvvm_kotlin.adapter.PostAdapter
 import live.tek.mvvm_kotlin.adapter.UserAdapter
 import live.tek.mvvm_kotlin.databinding.ActivityMainBinding
@@ -47,8 +50,9 @@ class MainActivity : AppCompatActivity() {
         })
         viewModel.postList.observe(this, Observer {
             supplyToAdapter(it)
-            test=it
+            test = it
         })
+
 
         viewModel.getUsers().observe(this@MainActivity, Observer {
             it?.let { resource ->
@@ -85,8 +89,10 @@ class MainActivity : AppCompatActivity() {
             )
         )
         binding.ivSearch.setOnClickListener {
-       // viewModel.doToast()
-
+            // viewModel.doToast()
+            GlobalScope.launch(Dispatchers.IO) {
+                viewModel.getAllPosts()
+            }
         }
 
         binding.etSearch.addTextChangedListener(
@@ -123,7 +129,7 @@ class MainActivity : AppCompatActivity() {
         postAdapter.apply {
             supplyPost(posts)
             notifyDataSetChanged()
-
+            binding.rv.adapter = postAdapter
         }
     }
 

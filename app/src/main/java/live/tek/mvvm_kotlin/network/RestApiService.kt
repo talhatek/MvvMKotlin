@@ -1,34 +1,34 @@
 package live.tek.mvvm_kotlin.network
 
+import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import live.tek.mvvm_kotlin.model.Post
-import live.tek.mvvm_kotlin.model.User
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class RestApiService {
     fun getAllPosts(onResult: (ArrayList<Post>?) -> Unit) {
         val retrofit = ServiceBuilder.buildService(IApi::class.java)
-        retrofit.getPost().enqueue(object : Callback<ArrayList<Post>> {
-            override fun onFailure(call: Call<ArrayList<Post>>?, t: Throwable?) {
-                onResult(null)
-            }
-
-            override fun onResponse(
-                call: Call<ArrayList<Post>>?,
-                response: Response<ArrayList<Post>>?
-            ) {
-                if (response!!.isSuccessful) {
-                    onResult(response.body())
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val res = retrofit.getPost()
+                if (res.isSuccessful) {
+                    onResult(res.body())
                 } else {
+                    Log.e("testing", res.code().toString())
                     onResult(null)
                 }
+
+            } catch (exception: Exception) {
+                Log.e("testing", exception.message!!)
+                onResult(null)
             }
-        })
+        }
+
 
     }
 
     suspend fun getAllUsers() =
-         ServiceBuilder.buildService(IApi::class.java).getUsers()
+        ServiceBuilder.buildService(IApi::class.java).getUsers()
 
 }

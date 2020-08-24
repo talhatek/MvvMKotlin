@@ -13,8 +13,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.onesignal.OneSignal
 import live.tek.mvvm_kotlin.adapter.PostAdapter
+import live.tek.mvvm_kotlin.adapter.UserAdapter
 import live.tek.mvvm_kotlin.databinding.ActivityMainBinding
 import live.tek.mvvm_kotlin.model.Post
+import live.tek.mvvm_kotlin.model.User
+import live.tek.mvvm_kotlin.utils.Status
 import live.tek.mvvm_kotlin.view_model.MainActivityViewModel
 
 
@@ -22,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
     private lateinit var postAdapter: PostAdapter
+    private lateinit var userAdapter: UserAdapter
     private lateinit var test: ArrayList<Post>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         viewModel = ViewModelProvider(this@MainActivity).get(MainActivityViewModel::class.java)
+       // viewModel=ViewModelProvider(this@MainActivity,ViewModelFactory(application)).get(MainActivityViewModel::class.java)
         OneSignal.startInit(this)
             .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
             .unsubscribeWhenNotificationsAreDisabled(true)
@@ -44,12 +49,31 @@ class MainActivity : AppCompatActivity() {
             supplyToAdapter(it)
             test=it
         })
-        postAdapter = PostAdapter(arrayListOf())
-        binding.rv.adapter=postAdapter
-        binding.ivSearch.setOnClickListener {
 
-        }
-        viewModel.getAllPosts()
+        viewModel.getUsers().observe(this@MainActivity, Observer {
+            it?.let { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        binding.rv.visibility = VISIBLE
+                        binding.searchProgress.visibility = GONE
+                        resource.data?.let { users -> retrieveList(users) }
+                    }
+                    Status.ERROR -> {
+                        binding.rv.visibility = VISIBLE
+                        binding.searchProgress.visibility = GONE
+                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                    }
+                    Status.LOADING -> {
+                        binding.searchProgress.visibility = VISIBLE
+                        binding.rv.visibility = GONE
+                    }
+                }
+            }
+        })
+        postAdapter = PostAdapter(arrayListOf())
+        userAdapter= UserAdapter((arrayListOf()))
+        binding.rv.adapter=userAdapter
+
         var temp: List<Post>
 
 
@@ -61,9 +85,10 @@ class MainActivity : AppCompatActivity() {
             )
         )
         binding.ivSearch.setOnClickListener {
-
+       // viewModel.doToast()
 
         }
+
         binding.etSearch.addTextChangedListener(
             object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
@@ -99,6 +124,14 @@ class MainActivity : AppCompatActivity() {
             supplyPost(posts)
             notifyDataSetChanged()
 
+        }
+    }
+
+    private fun retrieveList(users:List<User>){
+        userAdapter.apply {
+            addUsers(users)
+            notifyDataSetChanged()
+          //  binding.rv.adapter=userAdapter
         }
     }
 }

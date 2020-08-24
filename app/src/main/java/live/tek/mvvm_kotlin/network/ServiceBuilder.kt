@@ -8,9 +8,10 @@ object ServiceBuilder {
     private val client = OkHttpClient.Builder().build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://jsonplaceholder.typicode.com/") // change this IP for testing by your actual machine IP
+        .baseUrl("https://jsonplaceholder.typicode.com/")
+        //.baseUrl("https://5e510330f2c0d300147c034c.mockapi.io/")
         .addConverterFactory(GsonConverterFactory.create())
-        .client(client)
+       // .client(client)
         .build()
 
     fun <T> buildService(service: Class<T>): T {

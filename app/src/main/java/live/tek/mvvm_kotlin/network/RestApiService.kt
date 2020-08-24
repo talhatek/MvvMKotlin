@@ -1,6 +1,7 @@
 package live.tek.mvvm_kotlin.network
 
 import live.tek.mvvm_kotlin.model.Post
+import live.tek.mvvm_kotlin.model.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,4 +27,8 @@ class RestApiService {
         })
 
     }
+
+    suspend fun getAllUsers() =
+         ServiceBuilder.buildService(IApi::class.java).getUsers()
+
 }

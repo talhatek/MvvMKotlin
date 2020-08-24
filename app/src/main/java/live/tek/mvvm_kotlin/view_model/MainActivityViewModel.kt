@@ -13,8 +13,8 @@ import live.tek.mvvm_kotlin.utils.Resource
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = MainActivityRepository(application)
     val showProgress: LiveData<Boolean>
-    val postList: LiveData<ArrayList<Post>>
-    private val app=application
+    val postList: LiveData<Resource<List<Post>>>
+    private val app = application
     init {
         this.showProgress = repository.showProgress
         this.postList = repository.postList

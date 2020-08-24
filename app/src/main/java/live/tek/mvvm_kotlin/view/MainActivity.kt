@@ -49,8 +49,24 @@ class MainActivity : AppCompatActivity() {
             }
         })
         viewModel.postList.observe(this, Observer {
-            supplyToAdapter(it)
-            test = it
+            it?.let { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        binding.rv.visibility = VISIBLE
+                        binding.searchProgress.visibility = GONE
+                        resource.data?.let { posts -> supplyToAdapter(posts as ArrayList<Post>) }
+                    }
+                    Status.ERROR -> {
+                        binding.rv.visibility = VISIBLE
+                        binding.searchProgress.visibility = GONE
+                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                    }
+                    Status.LOADING -> {
+                        binding.searchProgress.visibility = VISIBLE
+                        binding.rv.visibility = GONE
+                    }
+                }
+            }
         })
 
 

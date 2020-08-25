@@ -153,7 +153,6 @@ class MainActivity : AppCompatActivity() {
         userAdapter.apply {
             addUsers(users)
             notifyDataSetChanged()
-          //  binding.rv.adapter=userAdapter
         }
     }
 }

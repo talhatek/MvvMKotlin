@@ -5,3 +5,9 @@ enum class Status {
     ERROR,
     LOADING
 }
+
+enum class Ex {
+    TIME_OUT,
+    DATABASE_ERROR,
+    NO_CONNECTION
+}

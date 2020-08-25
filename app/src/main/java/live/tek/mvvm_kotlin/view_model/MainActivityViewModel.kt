@@ -11,20 +11,22 @@ import live.tek.mvvm_kotlin.repository.MainActivityRepository
 import live.tek.mvvm_kotlin.utils.Resource
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
+
     private val repository = MainActivityRepository(application)
     val showProgress: LiveData<Boolean>
     val postList: LiveData<Resource<List<Post>>>
     private val app = application
+
     init {
         this.showProgress = repository.showProgress
         this.postList = repository.postList
-
     }
 
     fun changeState() {
         repository.changeState()
     }
-    fun doToast(){
+
+    fun doToast() {
         Toast.makeText(app.applicationContext, "Test", Toast.LENGTH_SHORT).show()
     }
 

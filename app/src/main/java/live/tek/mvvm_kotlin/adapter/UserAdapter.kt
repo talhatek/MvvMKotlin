@@ -6,6 +6,8 @@ import live.tek.mvvm_kotlin.model.User
 import live.tek.mvvm_kotlin.viewholder.UserViewHolder
 
 class UserAdapter (private val users:ArrayList<User>) : RecyclerView.Adapter<UserViewHolder>(){
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
       return  UserViewHolder(parent)
     }
@@ -24,6 +26,10 @@ class UserAdapter (private val users:ArrayList<User>) : RecyclerView.Adapter<Use
             addAll(users)
         }
 
+    }
+
+    fun deleteOne(position: Int) {
+        users.removeAt(position)
     }
 
 }

@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId "live.tek.mvvm_kotlin"
         manifestPlaceholders = [
-                onesignal_app_id: 'fc06f9cb-55ec-45b6-ace6-62ca1b079b8c',
+                onesignal_app_id: 'your api key',
                 // Project number pulled from dashboard, local value is ignored.
                 onesignal_google_project_number: 'REMOTE'
         ]

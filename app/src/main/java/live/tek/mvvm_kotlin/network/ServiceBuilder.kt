@@ -11,7 +11,7 @@ object ServiceBuilder {
         .baseUrl("https://jsonplaceholder.typicode.com/")
         //.baseUrl("https://5e510330f2c0d300147c034c.mockapi.io/")
         .addConverterFactory(GsonConverterFactory.create())
-       // .client(client)
+        .client(client)
         .build()
 
     fun <T> buildService(service: Class<T>): T {

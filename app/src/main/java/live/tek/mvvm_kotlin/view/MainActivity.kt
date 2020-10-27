@@ -1,7 +1,5 @@
 package live.tek.mvvm_kotlin.view
 
-import android.graphics.Canvas
-import android.graphics.Point
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,18 +8,13 @@ import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.onesignal.OneSignal
-import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import live.tek.mvvm_kotlin.R
 import live.tek.mvvm_kotlin.adapter.PostAdapter
 import live.tek.mvvm_kotlin.adapter.UserAdapter
 import live.tek.mvvm_kotlin.databinding.ActivityMainBinding
@@ -29,6 +22,8 @@ import live.tek.mvvm_kotlin.model.Post
 import live.tek.mvvm_kotlin.model.User
 import live.tek.mvvm_kotlin.utils.Status
 import live.tek.mvvm_kotlin.view_model.MainActivityViewModel
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,13 +32,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var postAdapter: PostAdapter
     private lateinit var userAdapter: UserAdapter
     private lateinit var test: ArrayList<Post>
+    private lateinit var testForUser: ArrayList<User>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        test = arrayListOf()
+        testForUser = arrayListOf()
         viewModel = ViewModelProvider(this@MainActivity).get(MainActivityViewModel::class.java)
-       // viewModel=ViewModelProvider(this@MainActivity,ViewModelFactory(application)).get(MainActivityViewModel::class.java)
+        // viewModel=ViewModelProvider(this@MainActivity,ViewModelFactory(application)).get(MainActivityViewModel::class.java)
         OneSignal.startInit(this)
             .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
             .unsubscribeWhenNotificationsAreDisabled(true)
@@ -61,7 +59,9 @@ class MainActivity : AppCompatActivity() {
                     Status.SUCCESS -> {
                         binding.rv.visibility = VISIBLE
                         binding.searchProgress.visibility = GONE
-                        resource.data?.let { posts -> supplyToAdapter(posts as ArrayList<Post>) }
+                        resource.data?.let { posts ->
+                            test= posts as ArrayList<Post>
+                            supplyToAdapter(posts) }
                     }
                     Status.ERROR -> {
                         binding.rv.visibility = VISIBLE
@@ -75,13 +75,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-        viewModel.getUsers().observe(this@MainActivity, Observer {
+
+
+       /* viewModel.getUsers().observe(this@MainActivity, Observer {
             it?.let { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
                         binding.rv.visibility = VISIBLE
                         binding.searchProgress.visibility = GONE
-                        resource.data?.let { users -> retrieveList(users) }
+                        resource.data?.let { users ->
+                            testForUser= users as ArrayList<User>
+                            retrieveList(users) }
                     }
                     Status.ERROR -> {
                         binding.rv.visibility = VISIBLE
@@ -94,13 +98,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        })
-        initTouchHelper()
+        })*/
         postAdapter = PostAdapter(arrayListOf())
-        userAdapter= UserAdapter((arrayListOf()))
-        binding.rv.adapter=userAdapter
+        userAdapter = UserAdapter((arrayListOf()))
+        binding.rv.adapter = userAdapter
 
         var temp: List<Post>
+        var tempUser: List<User>
 
 
 
@@ -111,10 +115,12 @@ class MainActivity : AppCompatActivity() {
             )
         )
         binding.ivSearch.setOnClickListener {
-            // viewModel.doToast()
-            GlobalScope.launch(Dispatchers.IO) {
+         //   viewModel.getUsers();
+
+          //  viewModel.doToast()
+           /* GlobalScope.launch(Dispatchers.IO) {
                 viewModel.getAllPosts()
-            }
+            }*/
         }
 
         binding.etSearch.addTextChangedListener(
@@ -133,117 +139,30 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    temp = test.filter {
-                        it.body.contains(s.toString())
+                    if(binding.rv.adapter==postAdapter){
+                        temp = test.filter {
+                            it.body.toLowerCase(Locale.ROOT).contains(s.toString())
+                        }
+                        postAdapter.apply {
+                            supplyPost(temp)
+
+                        }
                     }
-                    postAdapter.apply {
-                        supplyPost(temp)
-                        notifyDataSetChanged()
+                    else{
+                        tempUser = testForUser.filter {
+                            it.name.toLowerCase(Locale.ROOT).contains(s.toString())
+                        }
+                        postAdapter.apply {
+                            retrieveList(tempUser)
+
+                        }
                     }
+
                 }
 
             }
         )
 
-    }
-
-    private fun initTouchHelper() {
-        val itemTouchHelperCallBack = object : ItemTouchHelper.SimpleCallback(
-            0,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                TODO("Not yet implemented")
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                when (direction) {
-                    ItemTouchHelper.LEFT -> {
-                        userAdapter.deleteOne(viewHolder.adapterPosition)
-                        binding.rv.adapter!!.notifyItemRemoved(viewHolder.adapterPosition)
-                    }
-                }
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                //when we swipe 40 percent of the screen it will remove
-                val display = this@MainActivity.windowManager.defaultDisplay
-                val point = Point()
-                display.getSize(point)
-                val x = point.x
-                val temp = x / 10 * 4
-
-                if (dX < -temp) {
-                    RecyclerViewSwipeDecorator.Builder(
-                        c,
-                        recyclerView,
-                        viewHolder,
-                        dX,
-                        dY,
-                        actionState,
-                        isCurrentlyActive
-                    )
-                        .addSwipeLeftBackgroundColor(
-                            ContextCompat.getColor(
-                                this@MainActivity,
-                                R.color.colorDelete
-                            )
-                        )
-                        .addSwipeLeftActionIcon(R.drawable.ic_delete_white)
-                        .create()
-                        .decorate()
-                } else {
-                    RecyclerViewSwipeDecorator.Builder(
-                        c,
-                        recyclerView,
-                        viewHolder,
-                        dX,
-                        dY,
-                        actionState,
-                        isCurrentlyActive
-                    )
-                        .addSwipeLeftBackgroundColor(
-                            ContextCompat.getColor(
-                                this@MainActivity,
-                                R.color.colorDeleteUpper
-                            )
-                        )
-                        .addSwipeLeftActionIcon(R.drawable.ic_delete_white)
-                        .create()
-                        .decorate()
-                }
-
-
-                super.onChildDraw(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    dX,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-            }
-
-            override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-                return 0.4f
-            }
-        }
-
-        val myItemTouchHelper = ItemTouchHelper(itemTouchHelperCallBack)
-        myItemTouchHelper.attachToRecyclerView(binding.rv)
     }
 
     private fun supplyToAdapter(posts: ArrayList<Post>) {

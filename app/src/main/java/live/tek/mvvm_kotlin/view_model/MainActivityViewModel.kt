@@ -1,6 +1,7 @@
 package live.tek.mvvm_kotlin.view_model
 
 import android.app.Application
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -15,9 +16,9 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     private val repository = MainActivityRepository(application)
     val showProgress: LiveData<Boolean>
     val postList: LiveData<Resource<List<Post>>>
-    private val app = application
 
     init {
+        getAllPosts()
         this.showProgress = repository.showProgress
         this.postList = repository.postList
     }
@@ -27,14 +28,16 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun doToast() {
-        Toast.makeText(app.applicationContext, "Test", Toast.LENGTH_SHORT).show()
+       // Toast.makeText(getApplication(), "Test", Toast.LENGTH_SHORT).show()
     }
 
     fun getAllPosts() {
+        Log.e("viewModel","getPostsEmitted")
         repository.getAllPosts()
     }
 
     fun getUsers() = liveData(Dispatchers.IO) {
+        Log.e("viewModel","getUsersEmitted")
         emit(Resource.loading(data = null))
         try {
             emit(Resource.success(data = repository.getAllUsers()))

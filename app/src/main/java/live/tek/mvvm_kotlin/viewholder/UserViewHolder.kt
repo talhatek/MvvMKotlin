@@ -18,7 +18,7 @@ class UserViewHolder (content: ViewGroup) : RecyclerView.ViewHolder(
     private val binding=UserItemLayoutBinding.bind(itemView.rootView)
 
     fun bind(user: User){
-        itemView.txtUserName.text=user.name
+        binding.txtUserName.text=user.name
         itemView.txtEMail.text=user.email
     }
 }

@@ -12,9 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.onesignal.OneSignal
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import live.tek.mvvm_kotlin.adapter.PostAdapter
 import live.tek.mvvm_kotlin.adapter.UserAdapter
 import live.tek.mvvm_kotlin.databinding.ActivityMainBinding
@@ -23,7 +20,6 @@ import live.tek.mvvm_kotlin.model.User
 import live.tek.mvvm_kotlin.utils.Status
 import live.tek.mvvm_kotlin.view_model.MainActivityViewModel
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -77,15 +73,16 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-       /* viewModel.getUsers().observe(this@MainActivity, Observer {
+        viewModel.getUsers().observe(this@MainActivity, Observer {
             it?.let { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
                         binding.rv.visibility = VISIBLE
                         binding.searchProgress.visibility = GONE
                         resource.data?.let { users ->
-                            testForUser= users as ArrayList<User>
-                            retrieveList(users) }
+                            testForUser = users as ArrayList<User>
+                            retrieveList(users)
+                        }
                     }
                     Status.ERROR -> {
                         binding.rv.visibility = VISIBLE
@@ -98,7 +95,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        })*/
+        })
         postAdapter = PostAdapter(arrayListOf())
         userAdapter = UserAdapter((arrayListOf()))
         binding.rv.adapter = userAdapter
@@ -115,7 +112,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
         binding.ivSearch.setOnClickListener {
-         //   viewModel.getUsers();
+            viewModel.getAllPosts()
 
           //  viewModel.doToast()
            /* GlobalScope.launch(Dispatchers.IO) {

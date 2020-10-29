@@ -12,12 +12,11 @@ import live.tek.mvvm_kotlin.utils.Resource
 class RestApiService {
     @Suppress("UNCHECKED_CAST")
     fun getAllPosts(onResult: (Resource<ArrayList<Post>>) -> Unit) {
-        val retrofit = ServiceBuilder.buildService(IApi::class.java)
         GlobalScope.launch(Dispatchers.IO) {
             val task = withTimeoutOrNull(Const.TIME_OUT) {
                 onResult(Resource.loading(data = null))
                 try {
-                    val res = retrofit.getPost()
+                    val res = ServiceBuilder.myApi.getPost()
                     if (res.isSuccessful) {
                         onResult(Resource.success(data = res.body()) as Resource<ArrayList<Post>>)
                     } else {
@@ -38,6 +37,5 @@ class RestApiService {
     }
 
     suspend fun getAllUsers() =
-        ServiceBuilder.buildService(IApi::class.java).getUsers()
-
+        ServiceBuilder.myApi.getUsers()
 }

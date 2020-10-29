@@ -2,7 +2,6 @@ package live.tek.mvvm_kotlin.view_model
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
@@ -18,7 +17,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     val postList: LiveData<Resource<List<Post>>>
 
     init {
-        getAllPosts()
+        //getAllPosts()
         this.showProgress = repository.showProgress
         this.postList = repository.postList
     }

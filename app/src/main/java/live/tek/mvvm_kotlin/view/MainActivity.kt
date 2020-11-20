@@ -9,39 +9,36 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.onesignal.OneSignal
-import live.tek.mvvm_kotlin.adapter.PostAdapter
-import live.tek.mvvm_kotlin.adapter.UserAdapter
 import live.tek.mvvm_kotlin.databinding.ActivityMainBinding
+import live.tek.mvvm_kotlin.di.MainActivityDI
 import live.tek.mvvm_kotlin.model.Post
 import live.tek.mvvm_kotlin.model.User
 import live.tek.mvvm_kotlin.utils.Status
 import live.tek.mvvm_kotlin.view_model.MainActivityViewModel
+import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 
-
 class MainActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: MainActivityViewModel
-    private lateinit var postAdapter: PostAdapter
-    private lateinit var userAdapter: UserAdapter
-    private lateinit var test: ArrayList<Post>
-    private lateinit var testForUser: ArrayList<User>
+    private val viewModel: MainActivityViewModel by viewModel()
+    private val mainActivityDI: MainActivityDI by inject()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        test = arrayListOf()
-        testForUser = arrayListOf()
-        viewModel = ViewModelProvider(this@MainActivity).get(MainActivityViewModel::class.java)
+
+
+        //without koin and viewModelFactory
+        // viewModel = ViewModelProvider(this@MainActivity).get(MainActivityViewModel::class.java)
+        //with factory
         // viewModel=ViewModelProvider(this@MainActivity,ViewModelFactory(application)).get(MainActivityViewModel::class.java)
-        OneSignal.startInit(this)
-            .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-            .unsubscribeWhenNotificationsAreDisabled(true)
-            .init()
+
         viewModel.showProgress.observe(this@MainActivity, Observer {
             if (it) {
                 binding.searchProgress.visibility = VISIBLE
@@ -56,8 +53,9 @@ class MainActivity : AppCompatActivity() {
                         binding.rv.visibility = VISIBLE
                         binding.searchProgress.visibility = GONE
                         resource.data?.let { posts ->
-                            test= posts as ArrayList<Post>
-                            supplyToAdapter(posts) }
+                            mainActivityDI.aryPost = posts as ArrayList<Post>
+                            supplyToAdapter(posts)
+                        }
                     }
                     Status.ERROR -> {
                         binding.rv.visibility = VISIBLE
@@ -80,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                         binding.rv.visibility = VISIBLE
                         binding.searchProgress.visibility = GONE
                         resource.data?.let { users ->
-                            testForUser = users as ArrayList<User>
+                            mainActivityDI.aryUser = users as ArrayList<User>
                             retrieveList(users)
                         }
                     }
@@ -96,9 +94,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-        postAdapter = PostAdapter(arrayListOf())
-        userAdapter = UserAdapter((arrayListOf()))
-        binding.rv.adapter = userAdapter
+
+        binding.rv.adapter = mainActivityDI.userAdapter
 
         var temp: List<Post>
         var tempUser: List<User>
@@ -112,12 +109,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
         binding.ivSearch.setOnClickListener {
-            viewModel.getAllPosts()
 
-          //  viewModel.doToast()
-           /* GlobalScope.launch(Dispatchers.IO) {
-                viewModel.getAllPosts()
-            }*/
         }
 
         binding.etSearch.addTextChangedListener(
@@ -136,20 +128,19 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if(binding.rv.adapter==postAdapter){
-                        temp = test.filter {
+                    if (binding.rv.adapter == mainActivityDI.postAdapter) {
+                        temp = mainActivityDI.aryPost.filter {
                             it.body.toLowerCase(Locale.ROOT).contains(s.toString())
                         }
-                        postAdapter.apply {
+                        mainActivityDI.postAdapter.apply {
                             supplyPost(temp)
 
                         }
-                    }
-                    else{
-                        tempUser = testForUser.filter {
+                    } else {
+                        tempUser = mainActivityDI.aryUser.filter {
                             it.name.toLowerCase(Locale.ROOT).contains(s.toString())
                         }
-                        postAdapter.apply {
+                        mainActivityDI.postAdapter.apply {
                             retrieveList(tempUser)
 
                         }
@@ -163,15 +154,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun supplyToAdapter(posts: ArrayList<Post>) {
-        postAdapter.apply {
+        mainActivityDI.postAdapter.apply {
             supplyPost(posts)
             notifyDataSetChanged()
-            binding.rv.adapter = postAdapter
+            binding.rv.adapter = mainActivityDI.postAdapter
         }
     }
 
     private fun retrieveList(users: List<User>) {
-        userAdapter.apply {
+        mainActivityDI.userAdapter.apply {
             addUsers(users)
             notifyDataSetChanged()
         }

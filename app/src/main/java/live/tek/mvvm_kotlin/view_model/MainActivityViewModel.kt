@@ -36,7 +36,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun getUsers() = liveData(Dispatchers.IO) {
-        Log.e("viewModel","getUsersEmitted")
+        Log.e("viewModel", "getUsersEmitted")
         emit(Resource.loading(data = null))
         try {
             emit(Resource.success(data = repository.getAllUsers()))
@@ -46,5 +46,10 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        Log.e("cleared", "MainActivityViewModel gone")
+
+    }
 
 }

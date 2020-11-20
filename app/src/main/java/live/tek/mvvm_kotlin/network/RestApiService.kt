@@ -1,5 +1,6 @@
 package live.tek.mvvm_kotlin.network
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -8,6 +9,7 @@ import live.tek.mvvm_kotlin.model.Post
 import live.tek.mvvm_kotlin.utils.Const
 import live.tek.mvvm_kotlin.utils.Ex
 import live.tek.mvvm_kotlin.utils.Resource
+import retrofit2.HttpException
 
 class RestApiService {
     @Suppress("UNCHECKED_CAST")
@@ -24,6 +26,14 @@ class RestApiService {
                     }
 
                 } catch (exception: Exception) {
+                    if (exception is HttpException) {
+
+                        Log.e("httpEx", exception.code().toString())
+                    } else {
+                        Log.e("httpEx", "nope")
+
+                    }
+
                     onResult(Resource.error(data = null, message = Ex.NO_CONNECTION.name))
                 }
             }

@@ -6,7 +6,7 @@ import live.tek.mvvm_kotlin.model.Post
 import live.tek.mvvm_kotlin.network.RestApiService
 import live.tek.mvvm_kotlin.utils.Resource
 
-class MainActivityRepository(val application: Application) {
+class MainActivityRepository() {
     val showProgress = MutableLiveData<Boolean>()
     val postList = MutableLiveData<Resource<List<Post>>>()
 

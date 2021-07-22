@@ -19,9 +19,9 @@ class RestApiService {
                 onResult(Resource.loading(data = null))
                 try {
                     val res = ServiceBuilder.myApi.getPost()
-                    if (res.isSuccessful) {
+                    if (res.code()==200) {
                         onResult(Resource.success(data = res.body()) as Resource<ArrayList<Post>>)
-                    } else {
+                    } else if(res.code()==201)/*change error type*/ {
                         onResult(Resource.error(data = null, message = Ex.DATABASE_ERROR.name))
                     }
 

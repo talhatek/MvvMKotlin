@@ -78,7 +78,7 @@ abstract class ServiceBuilder {
             synchronized(this) {
                 Log.e("retrofit", "creating")
                 val instance = Retrofit.Builder()
-                    .baseUrl(BuildConfig.API_URL)
+                    .baseUrl(ApiUrl.url)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(OkHttpClient.Builder().build())
                     .build()
@@ -87,4 +87,7 @@ abstract class ServiceBuilder {
             }
         }
     }
+}
+object ApiUrl{
+    var url ="https://jsonplaceholder.typicode.com/"
 }

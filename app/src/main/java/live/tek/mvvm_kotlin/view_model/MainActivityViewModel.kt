@@ -2,9 +2,7 @@ package live.tek.mvvm_kotlin.view_model
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -12,13 +10,15 @@ import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import live.tek.mvvm_kotlin.model.Post
+import live.tek.mvvm_kotlin.model.User
 import live.tek.mvvm_kotlin.repository.MainActivityRepository
 import live.tek.mvvm_kotlin.utils.Resource
-import androidx.lifecycle.asLiveData
-class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
+import java.util.*
+
+class MainActivityViewModel(private val repository: MainActivityRepository) : ViewModel() {
     @ExperimentalCoroutinesApi
     internal val queryChannel = BroadcastChannel<String>(Channel.CONFLATED)
-
+    var userList = listOf<User>()
     @ExperimentalCoroutinesApi
     @FlowPreview
     val searchResult =
@@ -38,24 +38,22 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
 
 
-    private fun dataFromNetwork(query: String):Resource<List<String>> {
-        Log.e("searchDataCame","ji")
-        val myList = listOf("talha", "tek", "yusuf", "taha", "tuncer")
+    private fun dataFromNetwork(query: String):Resource<List<User>> {
 
-        val tmp = arrayListOf<String>()
-        myList.forEach {
-            if (it.contains(query))
-               throw Exception("flow Ex")
-               // tmp.add(it)
+        userList.filter {
+            it.name.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT))
+            // tmp.add(it)
+        }.let {
+            return Resource.success(data = it)
+
         }
-        return Resource.success(data = tmp)
 
     }
     @FlowPreview
     @ExperimentalCoroutinesApi
     val searchLiveData =searchResult.asLiveData()
 
-    private val repository = MainActivityRepository()
+
     val showProgress: LiveData<Boolean>
     val postList: LiveData<Resource<List<Post>>>
 
@@ -66,13 +64,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     }
 
-    fun changeState() {
-        repository.changeState()
-    }
 
-    fun doToast() {
-        // Toast.makeText(getApplication(), "Test", Toast.LENGTH_SHORT).show()
-    }
 
     fun getAllPosts() {
         Log.e("viewModel", "getPostsEmitted")

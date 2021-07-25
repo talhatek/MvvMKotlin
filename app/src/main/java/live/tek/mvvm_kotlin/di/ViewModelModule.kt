@@ -10,6 +10,6 @@ import kotlin.coroutines.CoroutineContext
 
 val viewModelModule = module {
     viewModel {
-        MainActivityViewModel(MainActivityRepository(ServiceBuilder.myApi))
+        MainActivityViewModel(ServiceBuilder.myApi,Dispatchers.IO)
     }
 }

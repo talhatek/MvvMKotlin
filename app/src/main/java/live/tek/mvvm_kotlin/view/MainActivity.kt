@@ -41,13 +41,6 @@ class MainActivity : AppCompatActivity() {
         //with factory
         // viewModel=ViewModelProvider(this@MainActivity,ViewModelFactory(application)).get(MainActivityViewModel::class.java)
 
-        viewModel.showProgress.observe(this@MainActivity, {
-            if (it) {
-                binding.searchProgress.visibility = VISIBLE
-            } else {
-                binding.searchProgress.visibility = GONE
-            }
-        })
 
 
         viewModel.getUsers().observe(this@MainActivity, {

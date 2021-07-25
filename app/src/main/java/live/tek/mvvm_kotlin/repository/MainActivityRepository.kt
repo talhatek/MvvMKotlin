@@ -1,12 +1,11 @@
 package live.tek.mvvm_kotlin.repository
 
-import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import live.tek.mvvm_kotlin.model.Post
-import live.tek.mvvm_kotlin.network.RestApiService
+import live.tek.mvvm_kotlin.network.IApi
 import live.tek.mvvm_kotlin.utils.Resource
 
-class MainActivityRepository() {
+class MainActivityRepository(private val networkSource: IApi) {
     val showProgress = MutableLiveData<Boolean>()
     val postList = MutableLiveData<Resource<List<Post>>>()
 
@@ -20,16 +19,22 @@ class MainActivityRepository() {
 
     }
 
-    fun getAllPosts() {
-        val apiService = RestApiService()
-        apiService.getAllPosts {
-            if (it != null) {
-                postList.postValue(it)
-            }
+   suspend fun getAllPosts() {
+        val data = networkSource.getPost()
+
+        if(data.code()==200){
+            postList.postValue(Resource.success(data = data.body() as List<Post>))
+
         }
+        else{
+            postList.postValue(Resource.error(data = null,message = "error"))
+        }
+
+
     }
 
-    suspend fun getAllUsers() =
-         RestApiService().getAllUsers()
+     suspend fun getAllUsers() =
+        networkSource.getUsers()
+
 
 }

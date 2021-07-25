@@ -3,9 +3,7 @@ package live.tek.mvvm_kotlin.view_model
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -19,6 +17,7 @@ class MainActivityViewModel(private val repository: MainActivityRepository) : Vi
     @ExperimentalCoroutinesApi
     internal val queryChannel = BroadcastChannel<String>(Channel.CONFLATED)
     var userList = listOf<User>()
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     val searchResult =
@@ -42,7 +41,6 @@ class MainActivityViewModel(private val repository: MainActivityRepository) : Vi
 
         userList.filter {
             it.name.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT))
-            // tmp.add(it)
         }.let {
             return Resource.success(data = it)
 
@@ -67,15 +65,21 @@ class MainActivityViewModel(private val repository: MainActivityRepository) : Vi
 
 
     fun getAllPosts() {
-        Log.e("viewModel", "getPostsEmitted")
-        repository.getAllPosts()
+//        Log.e("viewModel", "getPostsEmitted")
+        viewModelScope.launch {
+             repository.getAllPosts()
+
+
+        }
     }
 
     fun getUsers() = liveData(Dispatchers.IO) {
         Log.e("viewModel", "getUsersEmitted")
         emit(Resource.loading(data = null))
         try {
-            emit(Resource.success(data = repository.getAllUsers()))
+            val tmp =repository.getAllUsers()
+                userList=tmp
+            emit(Resource.success(data = tmp))
         } catch (exception: Exception) {
             emit(Resource.error(data = null, message = exception.message ?: "Error Occurred!"))
         }

@@ -60,6 +60,7 @@ import retrofit2.converter.gson.GsonConverterFactory
        return@lazy retrofit.create(IApi::class.java)
    }
 }*/
+
 abstract class ServiceBuilder {
     companion object {
         val myApi: IApi by lazy {
@@ -76,7 +77,7 @@ abstract class ServiceBuilder {
                 return temp
             }
             synchronized(this) {
-                Log.e("retrofit", "creating")
+//                Log.e("retrofit", "creating")
                 val instance = Retrofit.Builder()
                     .baseUrl(ApiUrl.url)
                     .addConverterFactory(GsonConverterFactory.create())
